@@ -10,7 +10,12 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "mathjs": "^9.2.0",
-    "vue": "^2.6.11"
+    "mobile-device-detect": "^0.4.3",
+    "react": "^17.0.1",
+    "react-color": "^2.19.3",
+    "simple-color-picker": "^1.0.4",
+    "vue": "^2.6.11",
+    "vue-color": "^2.8.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
