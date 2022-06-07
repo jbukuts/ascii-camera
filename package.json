@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:rust": "wasm-pack build --verbose",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -18,7 +19,11 @@
     "react-color": "^2.19.3",
     "simple-color-picker": "^1.0.4",
     "vue": "^2.6.11",
-    "vue-color": "^2.8.1"
+    "vue-color": "^2.8.1",
+    "vue-pinch-zoom": "^1.0.1",
+    "vue2-transitions": "^0.3.0",
+    "wasm_test": "file:pkg",
+    "wasm-server": "0.0.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -28,20 +33,6 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
   },
   "browserslist": [
     "> 1%",

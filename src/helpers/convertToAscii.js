@@ -33,7 +33,7 @@ const convertToAscii = async (video, frameColor, resReduce, destination) => {
     ctxAscii.fillStyle = '#000';
     ctxAscii.fillRect(0, 0, asciiCanvas.width, asciiCanvas.height);
 
-    ctxAscii.fillStyle = frameColor;
+    ctxAscii.fillStyle = `rgb(${frameColor[0]},${frameColor[1]},${frameColor[2]})`;
     ctxAscii.font = `${FONT_SIZE*resReduce}px consola`;
 
     
@@ -44,8 +44,6 @@ const convertToAscii = async (video, frameColor, resReduce, destination) => {
         ctxAscii.fillText(rowStr, 0, c);
         c += FONT_SIZE*resReduce;
     }
-       
-
 
     destination.drawImage(
         asciiCanvas, 0, 0,
