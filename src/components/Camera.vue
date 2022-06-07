@@ -1,9 +1,15 @@
 <template>
   <div id="camera-frame">
-    <h3 v-if="streamLoad === false">
-      ): Is your camera connected? :(
+    <h3
+      v-if="streamLoad === false"
+      style="text-align: center; width: 100%; left: 0"
+    >
+      Is your camera connected?
     </h3>
-    <h3 style="margin: 10px">
+    <h3
+      v-if="streamLoad"
+      style="margin: 10px"
+    >
       {{ frameTime }} ms
     </h3>
     <video
@@ -81,13 +87,14 @@ export default {
 
             const stream = await loadStream(); 
             this.streamLoad = stream !== null;
-            if (stream === null)
+            if (stream === null) {
+                this.streamLoad = false;
                 return;
+            }
             
             const video = this.$refs.camera;
             video.srcObject = stream;
             video.play();
-
 
             const finalCanvas = document.getElementById('final-ascii');
             const finalContext = finalCanvas.getContext('2d');
