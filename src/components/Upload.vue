@@ -140,6 +140,7 @@ input[type="file"] {
     cursor: pointer;
     margin: 2rem 1rem;
     transition: all .15s ease-in-out;
+    border-radius: 1rem;
 }
 
 #file-upload:hover {

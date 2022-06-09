@@ -8,9 +8,9 @@
     </h3>
     <h3
       v-if="streamLoad"
-      style="margin: 10px"
+      style="margin: 10px;"
     >
-      {{ frameTime }} ms
+      wasm draw: {{ frameTime }} ms
     </h3>
     <video
       id="camera"
@@ -65,7 +65,8 @@ export default {
                 video: { width: { ideal: 640 }, height: { ideal: 480 }},
                 audio: false 
             },
-            frameTime: 0
+            frameTime: 0,
+            cameraInterval: null
         }
     },
     async mounted() {
@@ -75,12 +76,15 @@ export default {
         }
         this.loadCamera();
     },
+    destroyed() {
+        clearInterval(this.cameraInterval);
+    },
     methods: {
         async loadCamera() {
             console.log('loading stream!');
             const loadStream = () => {
                 return navigator.mediaDevices.getUserMedia(this.constraints).then(
-                    (stream) => stream,
+                    (s) => s,
                     () => null
                 );
             };
@@ -136,7 +140,14 @@ export default {
                     video.requestVideoFrameCallback(createAsciiFrame);
                 });
             }
-            video.requestVideoFrameCallback(createAsciiFrame);
+
+            if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+                console.log('well use the callback');
+                video.requestVideoFrameCallback(createAsciiFrame);
+            }
+            else {
+                this.cameraInterval = setInterval(createRustFrame, 41);
+            }
         }
     }
 }

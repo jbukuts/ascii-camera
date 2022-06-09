@@ -9,7 +9,7 @@ use imageproc::drawing::{draw_text_mut,draw_filled_rect_mut};
 use imageproc::rect::Rect;
 use rusttype::{Scale,Font};
 
-static FONT_DATA: &[u8] = include_bytes!("/mnt/c/Windows/Fonts/consola.ttf");
+static FONT_DATA: &[u8] = include_bytes!("consola.ttf");
 const CHARACTERS: [char; 84] = ['-',':',',','_','^','~',';','!','>','<','=','*','/','r','+','?','c','L','(',')','v','7','i','T','s','l','z','t','J','x','u','n','f','Y','1','F','C','I','3','o','j','2','5','k','e','h','a','y','P','V','S','K','E','Z','w','X','U','4','b','6','9','p','m','d','q','G','A','#','O','R','H','D','%','8','B','W','N','M','$','0','Q','g','&','@'];
 
 #[wasm_bindgen]

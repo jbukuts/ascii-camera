@@ -76,7 +76,7 @@ export default {
         }
     },
     async mounted() {
-        await import('wasm_test').then((wasm) => {
+        await import('jakes-photo-booth').then((wasm) => {
             const {createAsciiImage, createDitherImage, createBadDitherImage, wasmMemory} = wasm;
             this.wasmMemory = wasmMemory;
             this.wasmEffects = [
@@ -133,7 +133,7 @@ html {
 
 html::after {    
   content: "";
-  background: url('./assets/static.png');
+  background: url('./assets/static.webp');
   position: fixed;
   z-index: -2;
   top: 0px;
@@ -141,7 +141,7 @@ html::after {
   right: 0px;
   bottom: 0px;
   left: 0px;
-  opacity: 0.4;
+  opacity: .5;
 }
 
 ::-webkit-scrollbar {
@@ -163,6 +163,7 @@ html::after {
   width: fit-content;
   margin: 0 auto;
   height: fit-content;
+  transform: translate3d(0,0,0);
 }
 
 </style>

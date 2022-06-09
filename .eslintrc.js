@@ -7,6 +7,7 @@ module.exports = {
       'plugin:vue/recommended',
       'eslint:recommended'
     ],
+    ignorePatterns: ["/pkg"],
     rules: {
         "eqeqeq": "warn",
         "strict": "off",
