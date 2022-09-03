@@ -18,15 +18,16 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      
+    - name: Get wasm-pack
+      uses: jetli/wasm-pack-action@v0.3.0
+      with:
+        version: 'latest'
 
     - name: Install dependencies
       working-directory: ./
       run: npm install
-      
-    - uses: jetli/wasm-pack-action@v0.3.0
-      with:
-        version: 'latest'
-      
+        
     - name: Build
       working-directory: ./
       run: CI=false npm run build
