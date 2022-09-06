@@ -36,7 +36,7 @@
         :class="cameraMode ? '' : 'disabled'"
         @click="takePicture()"
       >
-        <font-awesome-icon icon="camera" />
+        <p>📸</p> 
       </button>
     </div>
 
@@ -161,6 +161,12 @@ export default {
   border: none;
   background-color: rgb(216, 38, 38);
   transition: all .05s ease-in-out;
+}
+
+#picture-button > p {
+  font-size: 24px;
+  margin: 0;
+  filter: grayscale(1) contrast(0%) brightness(200%);
 }
 
 #picture-button:hover {

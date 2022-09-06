@@ -1,27 +1,24 @@
 {
   "homepage": "https://jbukuts.com/ascii-camera",
   "name": "ascii-camera",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "preinstall": "npm run build:rust",
-    "serve": "vue-cli-service serve",
+    "dev": "concurrently -k \"npm:dev:*\"",
+    "dev:rust": "nodemon --exec npm run build:rust",
+    "dev:vue": "vue-cli-service serve --https",
     "serve:prod": "python3 -m http.server -d dist",
     "build": "wasm-pack build --release && vue-cli-service build",
     "build:rust": "wasm-pack build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@fortawesome/vue-fontawesome": "^2.0.6",
+    "jakes-photo-booth": "file:pkg",
     "mobile-device-detect": "^0.4.3",
     "react": "^17.0.1",
-    "simple-color-picker": "^1.0.4",
     "vue": "^2.6.11",
     "vue-pinch-zoom": "^1.0.1",
     "vue2-transitions": "^0.3.0",
-    "jakes-photo-booth": "file:pkg",
     "wasm-server": "0.0.4"
   },
   "devDependencies": {
@@ -29,9 +26,18 @@
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
+    "concurrently": "^7.3.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "nodemon": "^2.0.19",
     "vue-template-compiler": "^2.6.11"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "target/*",
+      "pkg/*"
+    ],
+    "watch": "src/lib.rs"
   },
   "browserslist": [
     "> 1%",
