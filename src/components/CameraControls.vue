@@ -1,201 +1,258 @@
-<template>
-  <div id="camera-controls">
-    <div
-      class="section"
-      style="text-align: left"
-    >
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementFgColor()"
-      >
-        fg_color: {{ fgColors[fgColorIndex][0] }}
-      </p>
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementBgColor()"
-      >
-        bg_color: {{ bgColors[bgColorIndex][0] }}
-      </p>
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementResolution()"
-      >
-        quality: {{ resolutions[resolutionIndex][0] }}
-      </p>
-      <p
-        class="option-item"
-        @click="updateEffect()"
-      >
-        effect: {{ effect }}
-      </p>
-    </div>
+<script setup>
+import { computed, ref } from 'vue'
+import DropDown from '@/components/DropDown.vue'
+import SimpleArrow from '@/components/SimpleArrow.vue'
+import {
+  colors,
+  fakeCanvas,
+  qualities,
+  reverseColors,
+  reverseQualities,
+  reverseSupportedResolutions,
+  supportedResolutions
+} from '@/constants'
+import database from '@/database'
+import useCamera from '@/lib/hooks/use-camera/use-camera'
+import { store } from '@/store'
+import CheckBox from './CheckBox.vue'
 
-    <div class="section">
+const { cameraList, activeCamera } = useCamera()
+const showControls = ref(true)
+
+const dropDowns = computed(() => [
+  {
+    title: 'camera',
+    display: (item) => item.camera.label,
+    data: cameraList.value,
+    handler: (newSelect) => {
+      activeCamera.value = newSelect
+    },
+    default: activeCamera,
+    disabled: store.pauseStream
+  },
+  {
+    title: 'resolution',
+    display: (item) => {
+      const [w, h] = supportedResolutions[item]
+      return `${item} (${w} x ${h})`
+    },
+    desc: "defines the camera's source resolution",
+    data: Object.keys(supportedResolutions),
+    handler: (newRes) => {
+      store.resolution = supportedResolutions[newRes]
+    },
+    default: reverseSupportedResolutions[store.resolution.toString()],
+    disabled: store.pauseStream
+  },
+  {
+    title: 'quality',
+    desc: 'defines to box size groups of pixels are sourced from',
+    display: (item) => {
+      const v = qualities[item]
+      return `${item} (${v} x ${v})`
+    },
+    data: Object.keys(qualities),
+    handler: (newQuality) => {
+      store.quality = qualities[newQuality]
+    },
+    default: reverseQualities[store.quality]
+  },
+  {
+    title: 'effect',
+    data: Object.keys(store.wasmEffects),
+    handler: (newEffect) => {
+      store.activeEffect = newEffect
+    },
+    default: store.activeEffect
+  },
+  {
+    title: 'background',
+    data: Object.keys(colors),
+    handler: (newBg) => {
+      store.bgColor = colors[newBg]
+    },
+    default: reverseColors[store.bgColor.toString()]
+  },
+  {
+    title: 'foreground',
+    data: Object.keys(colors),
+    handler: (newFg) => {
+      store.fgColor = colors[newFg]
+    },
+    default: reverseColors[store.fgColor.toString()]
+  }
+])
+
+const checkBoxes = computed(() => [
+  {
+    title: 'debug_mode',
+    handler: (v) => (store.debugMode = v),
+    default: store.debugMode
+  },
+  {
+    title: 'show_orig',
+    handler: (v) => (store.showOrig = v),
+    default: store.showOrig
+  }
+])
+
+const storePhoto = () => {
+  const genImage = document.getElementById('drawn-picture').toDataURL()
+  const srcImage = fakeCanvas.toDataURL()
+  const settings = {
+    quality: store.quality,
+    effect: store.activeEffect,
+    background: Array.from(store.bgColor),
+    foreground: Array.from(store.fgColor),
+    dateCreated: Date.now()
+  }
+
+  database.insertValue({
+    srcImage,
+    genImage,
+    settings
+  })
+
+  console.log(settings)
+}
+</script>
+
+<template>
+  <div id="camera-controls-container">
+    <div id="camera-controls-buttons">
       <button
-        id="picture-button"
-        :class="cameraMode ? '' : 'disabled'"
-        @click="takePicture()"
-      >
-        <p>📸</p> 
+        v-if="store.pauseStream"
+        @click="store.pauseStream = false"
+        type="button">
+        discard 🗑️
+      </button>
+      <button
+        type="button"
+        :class="store.pauseStream ? 'hide' : ''"
+        :disabled="store.pauseStream"
+        @click="store.pauseStream = true"
+        id="snap-photo"></button>
+      <button v-if="store.pauseStream" @click="storePhoto" type="button">
+        save 💾
       </button>
     </div>
 
     <div
-      class="section"
-      style="text-align: right"
-    >
-      <p
-        class="option-item"
-        @click="toggleView()"
-      >
-        {{ cameraMode ? 'upload_image' : 'camera_view' }}
-      </p>
+      id="camera-controls-settings"
+      :class="[{ 'control-visible': showControls }]">
+      <DropDown
+        v-for="item in dropDowns"
+        v-bind:key="item.title"
+        :step-data="item.data"
+        :display="item.display"
+        :handler="item.handler"
+        :title="item.title"
+        :description="item.desc"
+        :disabled="item.disabled"
+        :default="item.default"></DropDown>
+      <CheckBox
+        v-for="item in checkBoxes"
+        v-bind:key="item.title"
+        :title="item.title"
+        :default="item.default"
+        :handler="item.handler"></CheckBox>
     </div>
+
+    <button
+      @click="showControls = !showControls"
+      id="toggle-controls-button"
+      title="toggle controls">
+      <SimpleArrow :dir="showControls ? 'up' : 'down'" />
+    </button>
   </div>
 </template>
 
-<script>
-
-export default {
-    name: 'CameraControls',
-    props: {
-        updateFgColor: {
-            type: Function,
-            required: true
-        },
-        updateBgColor: {
-            type: Function,
-            required: true
-        },
-        updateResolution: {
-            type: Function,
-            required: true
-        },
-        updateEffect: {
-            type: Function,
-            required: true
-        },
-        takePicture: {
-            type: Function,
-            required: true
-        },
-        toggleView: {
-            type: Function,
-            required: true
-        },
-        cameraMode: {
-            type: Boolean,
-            required: true
-        },
-        effect: {
-            type: String,
-            required: true
-        }
-    },
-    data() {
-        return {
-            resolutions: [
-                ['very_low', 12],
-                ['low', 10],
-                ['medium', 8],
-                ['high', 6]
-            ],
-            fgColors: [
-                ["white", [255,255,255]],
-                ["black", [0,0,0]],
-                ["red", [255,0,0]],
-                ["green", [0,255,0]],
-                ["blue", [0,0,255]]
-            ],
-            bgColors: [
-                ["black", [0,0,0]],
-                ["white", [255,255,255]],
-                ["red", [255,0,0]],
-                ["green", [0,255,0]],
-                ["blue", [0,0,255]]
-            ],
-            fgColorIndex: 0,
-            bgColorIndex: 0,
-            resolutionIndex: 0
-        }
-    },
-    methods: {
-        incrementBgColor() {
-            this.bgColorIndex = this.bgColorIndex <  this.bgColors.length - 1 ? this.bgColorIndex+1 : 0;
-            this.updateBgColor({ hex: this.bgColors[this.bgColorIndex][1] });
-        },
-        incrementFgColor() {
-            this.fgColorIndex = this.fgColorIndex < this.fgColors.length - 1 ? this.fgColorIndex+1 : 0;
-            this.updateFgColor({ hex: this.fgColors[this.fgColorIndex][1] });
-        },
-        incrementResolution() {
-            this.resolutionIndex = this.resolutionIndex < this.resolutions.length - 1 ? this.resolutionIndex+1 : 0;
-            this.updateResolution({ target: { value: this.resolutions[this.resolutionIndex][1] }});
-        }
-    }
-}
-</script>
-
-<style scoped>
-
-#camera-controls {
-    width: 640px;
-    height: fit-content;
-    background-color: black;
-    margin: 0 auto;
-    box-sizing: border-box;
-    padding: 1rem;
-    color: white;
-    align-items: center;
-    display: flex;
-}
-
-.section {
-  flex: 1 1 0px
-}
-
-#picture-button {
-  border-radius: 50%;
-  height: 4rem;
-  width: 4rem;
-  border: none;
-  background-color: rgb(216, 38, 38);
-  transition: all .05s ease-in-out;
-}
-
-#picture-button > p {
-  font-size: 24px;
-  margin: 0;
-  filter: grayscale(1) contrast(0%) brightness(200%);
-}
-
-#picture-button:hover {
-  cursor: pointer;
-  background-color: rgb(142, 0, 0);;
-}
-
-#picture-button:active {
-  background-color: rgb(102, 0, 0);
-  border: 1px solid #ccc;
-}
-
-.svg-inline--fa {
-  height: 1.5rem !important;
-  width: 1.5rem !important;
-  color: white;
-}
-
-.option-item {
-  margin: .5rem 0px;
-}
-
-.option-item:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.disabled {
-  opacity: .5;
+<style scoped lang="scss">
+.hide {
+  visibility: hidden;
   pointer-events: none;
+}
+
+#toggle-controls-button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  margin-top: 1rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+#camera-controls-container {
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.575rem;
+}
+
+#camera-controls-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+
+  & > button {
+    appearance: none;
+    background-color: white;
+    font-size: 1rem;
+    padding: 0.65rem 0.2rem;
+    color: black;
+    border: 2px solid black;
+    border-radius: 6px;
+    height: fit-content;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.175);
+    }
+  }
+}
+
+#snap-photo {
+  justify-self: center;
+  grid-column-start: 2;
+  width: fit-content;
+  border: none !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1;
+  padding: 0.65rem !important;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  font-size: 1.5rem !important;
+  line-height: 1;
+
+  &:hover {
+    background-color: black !important;
+  }
+
+  &::after {
+    content: '📷';
+    position: relative;
+    bottom: 10%;
+    filter: grayscale(1) contrast(0) brightness(200%);
+  }
+}
+
+.control-visible {
+  max-height: 1000px !important;
+  // transition: max-height 1s ease-out;
+}
+
+#camera-controls-settings {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 1s ease-out;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto;
+  column-gap: 0.875rem;
+  row-gap: 0.375rem;
+  border-top: none;
 }
 </style>

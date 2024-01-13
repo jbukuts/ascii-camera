@@ -1,0 +1,1 @@
+/mnt/c/Users/jbukuts/Documents/Projects/ascii-update/rust_src/target/wasm32-unknown-unknown/release/jakes_photo_booth.wasm: /mnt/c/Users/jbukuts/Documents/Projects/ascii-update/rust_src/consola.ttf /mnt/c/Users/jbukuts/Documents/Projects/ascii-update/rust_src/lib.rs

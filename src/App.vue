@@ -1,169 +1,98 @@
-<template>
-  <div id="app">
-    <h1 style="text-align: left">
-      ascii_camera_reborn
-    </h1>
+<script setup>
+import { onMounted, ref } from 'vue'
+import AsciiHeader from '@/components/AsciiHeader.vue'
+import CameraControls from '@/components/CameraControls.vue'
+import CameraView from '@/components/CameraView.vue'
+import LibraryView from '@/components/LibraryView.vue'
+import { store } from '@/store'
+import AboutView from './components/AboutView.vue'
 
-    <div
-      id="camera-container"
-    >
-      <collapse-transition>
-        <Camera 
-          v-if="cameraShow && wasmEffects"
-          :text-color="frameColor" 
-          :bg-color="bgColor" 
-          :resolution="resReduce"
-          :effect-function="wasmEffects[effectIndex][1]"
-          :effect-name="wasmEffects[effectIndex][0] || ''"
-          :wasm-memory="wasmMemory"
-        />
-        <Upload 
-          v-if="!cameraShow && wasmEffects"
-          :text-color="frameColor" 
-          :bg-color="bgColor" 
-          :resolution="resReduce"
-          :effect-function="wasmEffects[effectIndex][1]"
-          :effect-name="wasmEffects[effectIndex][0] || ''"
-          :wasm-memory="wasmMemory"
-        />
-      </collapse-transition>
-      
-      
-      <CameraControls
-        v-if="wasmEffects"
-        :toggle-view="toggleView"
-        :update-fg-color="updateFgColor" 
-        :update-bg-color="updateBgColor" 
-        :update-resolution="updateResolution"
-        :update-effect="updateEffect"
-        :take-picture="takePicture"
-        :camera-mode="cameraShow"
-        :effect="wasmEffects[effectIndex][0] || ''"
-      />
-    </div>
+const cameraReady = ref(false)
 
-    <Footer />
-  </div>
-</template>
-
-<script>
-import {CollapseTransition} from 'vue2-transitions'
-import { isMobile } from 'mobile-device-detect';
-import Camera from './components/Camera.vue';
-import Footer from './components/Footer.vue';
-import CameraControls from './components/CameraControls.vue';
-import Upload from './components/Upload.vue';
-
-export default {
-    name: 'App',
-    components: {
-        'Camera': Camera,
-        'Footer': Footer,
-        'CameraControls': CameraControls,
-        'Upload': Upload,
-        'CollapseTransition': CollapseTransition
-    },
-    data() {
-        return {
-            mobile: isMobile,
-            resReduce: 12,
-            frameColor: [255,255,255],
-            bgColor: [0,0,0],
-            cameraShow: !isMobile,
-            wasmEffects: null,
-            wasmMemory: null,
-            effectIndex: 0
-        }
-    },
-    async mounted() {
-        await import('jakes-photo-booth').then((wasm) => {
-            const {createAsciiImage, createDitherImage, createBadDitherImage, wasmMemory} = wasm;
-            this.wasmMemory = wasmMemory;
-            this.wasmEffects = [
-                ['ascii', createAsciiImage],
-                ['bin_dither', createDitherImage],
-                ['glitch_dither', createBadDitherImage]
-            ];
-            console.log('Successfully loaded wasm module!');
-        }).catch((err) => console.error("Failed to load wasm module" + err));
-    },
-    methods: {
-        toggleView() {
-            this.cameraShow = !this.cameraShow;
-        },
-        updateEffect() {
-            this.effectIndex = this.effectIndex <  this.wasmEffects.length - 1 ? this.effectIndex+1 : 0;
-        },
-        updateBgColor(e) {
-            this.bgColor = e.hex;
-        },
-        updateFgColor(e) {
-            this.frameColor = e.hex;
-        },
-        updateResolution(e) {
-            this.resReduce = parseInt(e.target.value);
-        },
-        takePicture() {
-            console.log('taking picture!');
-            const frameCanvas = document.getElementById('final-ascii');
-            const link = document.createElement("a");
-            link.download = 'download.png';
-            link.href = frameCanvas.toDataURL();
-            link.click();  
-            link.delete;
-        }
-    }
+const tabs = {
+  camera: CameraView,
+  upload: '',
+  libary: LibraryView,
+  about: AboutView
 }
+
+onMounted(() => {
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: false })
+    .then(() => {
+      cameraReady.value = true
+    })
+
+  store.wasmEffects = {
+    ascii: '',
+    bin_dither: '',
+    glitch_dither: ''
+  }
+})
 </script>
 
-<style>
-@font-face {
-  font-family: consola;
-  src: url(consola.ttf);
+<template>
+  <AsciiHeader />
+  <div v-if="cameraReady" id="main-container">
+    <div id="display-pane">
+      <div id="tab-controls">
+        <button
+          v-for="tab in Object.keys(tabs)"
+          :key="tab"
+          :class="['tab-button', { active: store.screen === tab }]"
+          @click="store.screen = tab">
+          {{ tab }}
+        </button>
+      </div>
+      <hr />
+    </div>
+    <KeepAlive><component :is="tabs[store.screen]"></component></KeepAlive>
+    <CameraControls v-if="cameraReady && store.screen === 'camera'" />
+  </div>
+  <p><small>@jbukuts 2024</small></p>
+</template>
+
+<style scoped lang="scss">
+$main-border-size: 3px;
+
+#main-container {
+  border: $main-border-size solid black;
 }
 
-html, body {
-  margin: 0px;
-  user-select: none;
+#display-pane {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 0.25rem;
+  padding: 0.275rem 0.275rem;
+  border-bottom: $main-border-size solid black;
+
+  & > hr {
+    flex-grow: 1;
+    border-top: thick double black;
+    border-bottom: 2px solid black;
+    padding: 1px;
+  }
 }
 
-html {
-  background: rgb(235, 235, 235);
+.tab-button {
+  border: 2px solid transparent;
+  background-color: white;
+  outline: none;
+  font-size: small;
+  padding: 3px 5px;
+
+  &:hover {
+    border-color: black;
+    cursor: pointer;
+  }
 }
 
-html::after {    
-  content: "";
-  background: url('./assets/static.webp');
-  position: fixed;
-  z-index: -2;
-  top: 0px;
-  filter: grayscale(1);
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  opacity: .5;
+.tab-button.active {
+  background-color: rgb(0, 0, 0);
+  color: white;
+  font-weight: bold;
 }
-
-::-webkit-scrollbar {
-  display: none;
-}
-
-#app {
-  color: black;
-  text-align: center;
-  padding-top: 4rem;
-  font-family: consola;
-  width: fit-content;
-  margin: 0 auto
-}
-
-#camera-container {
-  border-radius: 1rem;
-  overflow: hidden;
-  width: fit-content;
-  margin: 0 auto;
-  height: fit-content;
-  transform: translate3d(0,0,0);
-}
-
 </style>
