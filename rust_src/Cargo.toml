@@ -2,6 +2,9 @@
 name = "jakes-photo-booth"
 version = "0.1.0"
 edition = "2021"
+description = "Image effects written in Rust for WebAssembly"
+repository = "https://github.com/jbukuts/ascii-camera.git"
+license = "MIT"
 
 [profile.release]
 lto = true
@@ -14,7 +17,10 @@ path = './lib.rs'
 [dependencies]
 wasm-bindgen = "0.2.80"
 image = "0.24.2"
-imageproc = "*"
-rusttype = "*"
-web-sys = "*"
+imageproc = "0.23.0"
+rusttype = "0.9.2"
+web-sys = "0.3.57"
 js-sys = "0.3.57"
+colorgrad = { git = "https://github.com/mazznoer/colorgrad-rs", default-features = false, features = ['preset'] }
+phf = { version = "0.11", default-features = false, features = ['macros'] }
+lazy_static = "*"

@@ -26,8 +26,8 @@ async function createVideoStream(options) {
     video: {
       facingMode: 'user',
       frameRate: { ideal: 24, max: 30 },
-      width: { ideal: width },
-      height: { ideal: height },
+      width: { min: 160, ideal: width },
+      height: { min: 240, ideal: height, max: 480 },
       deviceId: {
         exact: deviceId
       }

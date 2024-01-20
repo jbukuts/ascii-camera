@@ -63,12 +63,12 @@ watch(selected, props.handler)
     padding: 0.05rem 0.3rem;
     // border-radius: 50%;
     opacity: 0.5;
-    transition: opacity 0.15s linear;
+    transition: opacity 0.1s linear;
     border-radius: 2px;
+  }
 
-    &:hover {
-      opacity: 1;
-    }
+  &:hover::after {
+    opacity: 1;
   }
 }
 

@@ -1,15 +1,14 @@
 @use 'base';
 
-@font-face {
-  font-family: Chicago;
-  src: url(Chicago.ttf);
-}
+// @font-face {
+//   font-family: Chicago;
+//   src: url(Chicago.ttf);
+// }
 
 body {
   display: flex;
   align-items: center;
   justify-content: center;
-  // padding: 0.5rem;
   flex-direction: column;
 }
 
@@ -18,7 +17,6 @@ body {
   flex-direction: column;
   width: min($app-width, 100vw);
   min-height: 500px;
-  padding: 0 0.5rem;
 }
 
 @media (hover: hover) {
@@ -29,7 +27,7 @@ body {
 
 @media (max-width: $app-width) {
   body {
-    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 

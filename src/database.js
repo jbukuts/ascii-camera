@@ -118,5 +118,24 @@ const createDatabase = async (startingData = []) => {
   })
 }
 
+class DBInstance {
+  static instance
+
+  static async loadInstance(startingData = []) {
+    const i = await createDatabase(startingData)
+    DBInstance.instance = i
+  }
+
+  static getInstance() {
+    if (!DBInstance.instance) {
+      console.error('you must first load the instance via: loadInstance()')
+      return
+    }
+
+    return DBHandler.instance
+  }
+}
+
 const database = await createDatabase()
 export default database
+export { DBInstance }

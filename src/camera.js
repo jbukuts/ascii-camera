@@ -74,11 +74,11 @@ async function activateStream(videoEl, options) {
       resolution: resolution
     })
 
-    // videoEl.srcObject?.getVideoTracks().forEach((track) => {
-    //   console.info('removing track', track)
-    //   track.stop()
-    //   videoEl.srcObject.removeTrack(track)
-    // })
+    videoEl.srcObject?.getVideoTracks().forEach((track) => {
+      console.info('removing track', track)
+      track.stop()
+      videoEl.srcObject.removeTrack(track)
+    })
 
     videoEl.srcObject = stream
 

@@ -1,4 +1,5 @@
 const fakeCanvas = document.createElement('canvas')
+const fakeContext = fakeCanvas.getContext('2d', { willReadFrequently: true })
 
 const colors = {
   black: [0, 0, 0],
@@ -40,8 +41,8 @@ const defaults = {
   fg: 'white',
   bg: 'black',
   resolution: 'vga',
-  quality: 'very_low',
-  effect: 'ascii'
+  quality: 'medium',
+  effect: 'heat_map'
 }
 
 export {
@@ -52,5 +53,6 @@ export {
   supportedResolutions,
   reverseSupportedResolutions,
   defaults,
-  fakeCanvas
+  fakeCanvas,
+  fakeContext
 }

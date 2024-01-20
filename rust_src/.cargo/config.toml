@@ -3,4 +3,5 @@ build-std = ['std', 'panic_abort']
 
 [build]
 target = "wasm32-unknown-unknown"
-rustflags = '-Ctarget-feature=+atomics,+bulk-memory,+mutable-globals'
+# for shared memory between WASM workers
+# rustflags = '-Ctarget-feature=+atomics,+bulk-memory,+mutable-globals'

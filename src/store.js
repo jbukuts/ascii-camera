@@ -10,5 +10,7 @@ export const store = reactive({
   screen: 'camera',
   pauseStream: false,
   debugMode: false,
-  showOrig: false
+  showOrig: false,
+  showEffects: false,
+  showSettings: false
 })

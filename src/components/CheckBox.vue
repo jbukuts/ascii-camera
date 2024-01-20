@@ -43,6 +43,7 @@ watch(checked, props.handler)
 .checkbox-wrapper.horizontal {
   flex-direction: row;
   gap: 0.25rem;
+  align-items: center;
 }
 
 .checkbox-wrapper.vertical {

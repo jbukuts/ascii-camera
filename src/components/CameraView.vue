@@ -1,21 +1,33 @@
 <script setup>
-import { onActivated, ref, watch, watchEffect } from 'vue'
-import { fakeCanvas } from '@/constants'
+import { onActivated, onDeactivated, ref, watch, watchEffect } from 'vue'
+import { fakeCanvas, fakeContext } from '@/constants'
 import { useCamera, useVideo, useWorker } from '@/lib/hooks'
 import { store } from '@/store'
-
-const fakeContext = fakeCanvas.getContext('2d', { willReadFrequently: true })
+import AllEffects from './AllEffects.vue'
+import CameraSettings from './CameraSettings.vue'
 
 const videoRef = useVideo()
 const finalCanvasRef = ref()
-const { activeCamera, state } = useCamera()
+const { activeCamera, state: cameraState } = useCamera()
 const { data, post, sharedArr, sharedBuffer } = useWorker()
 const startTime = ref(0)
 const endTime = ref(1)
-const renderError = ref(false)
+const renderState = ref('loading')
+
+// ghetto mutex
+const mutex = ref(0)
 
 const postToWorker = () => {
   try {
+    if (mutex.value !== 0) {
+      console.warn(
+        'Tried to apply effect when worker is already running. Stopping'
+      )
+      return
+    }
+
+    if (store.screen !== 'camera') return
+
     // get source image dimensions
     const sourceWidth = videoRef.value?.videoWidth || 0
     const sourceHeight = videoRef.value?.videoHeight || 0
@@ -30,6 +42,12 @@ const postToWorker = () => {
       fakeCanvas.height = sourceHeight
       fakeContext.drawImage(videoRef.value, 0, 0, sourceWidth, sourceHeight)
     }
+
+    if (store.showEffects) {
+      videoRef.value?.requestVideoFrameCallback(postToWorker)
+      return
+    }
+
     const { data: pixelData } = fakeContext.getImageData(
       0,
       0,
@@ -43,6 +61,7 @@ const postToWorker = () => {
     }
     // pixelData.forEach((v, i) => (sharedArr[i] = v))
 
+    mutex.value += 1
     post({
       pixelData: sharedArr,
       sourceHeight,
@@ -61,7 +80,9 @@ const handleStreamChanges = async () => {
   const videoEl = videoRef.value
   if (!videoEl || !activeCamera.value?.camera) return
   console.log('cameratime', activeCamera.value.camera.label)
-  await activeCamera.value?.activate(videoEl, { resolution: store.resolution })
+  return await activeCamera.value?.activate(videoEl, {
+    resolution: store.resolution
+  })
 }
 
 // handle received messages from the worker
@@ -91,13 +112,14 @@ watch(data, (message) => {
 
     // go around again
     endTime.value = performance.now() - startTime.value
-    renderError.value = false
+    renderState.value = 'success'
+    mutex.value -= 1
   } catch (e) {
-    renderError.value = true
+    renderState.value = 'error'
     console.error('Error handling response from worker', e)
   }
 
-  videoRef.value.requestVideoFrameCallback(postToWorker)
+  videoRef.value?.requestVideoFrameCallback(postToWorker)
 })
 
 // handle changes to resolution and camera
@@ -105,30 +127,46 @@ watchEffect(handleStreamChanges, { flush: 'post' })
 
 onActivated(() => {
   if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
-    console.log('start render loop', videoRef.value)
     handleStreamChanges().then(() => {
-      videoRef.value.requestVideoFrameCallback(postToWorker)
+      console.log('start render loop', videoRef.value.requestVideoFrameCallback)
+      videoRef.value?.requestVideoFrameCallback(postToWorker)
     })
   }
+})
+
+onDeactivated(() => {
+  renderState.value = 'loading'
+  mutex.value = 0
 })
 </script>
 
 <template>
   <div id="camera-view-container">
-    <div class="render-state" v-if="renderError">
-      <p>Error during render. Trying changing settings,</p>
-    </div>
-    <div class="render-state" v-if="state === 'error'">
-      <p>Error connecting camera. Try changing camera or reloading.</p>
-    </div>
-    <div class="render-state" v-if="state === 'loading'"><p>Loading...</p></div>
     <video
       ref="videoRef"
       id="video-src"
       :class="!store.showOrig ? 'hide' : ''"
       playsinline
       autoplay
-      muted></video>
+      muted
+      disable-picture-in-picture></video>
+    <CameraSettings v-if="store.showSettings" />
+    <AllEffects
+      v-if="cameraState === 'success' && store.showEffects"
+      :source-height="videoRef?.videoHeight || 0"
+      :source-width="videoRef?.videoWidth || 0" />
+
+    <div
+      class="render-state"
+      v-if="cameraState !== 'success' || renderState !== 'success'">
+      <p v-if="cameraState === 'error' || renderState === 'error'">
+        Error connecting camera. Try changing camera or reloading.
+      </p>
+      <p v-else-if="cameraState === 'loading' || renderState === 'loading'">
+        Loading...
+      </p>
+    </div>
+
     <canvas ref="finalCanvasRef" id="drawn-picture"></canvas>
     <p id="render-time" v-if="store.debugMode">
       {{ (1000 / endTime).toFixed(2) }} fps<br />
@@ -165,11 +203,21 @@ onActivated(() => {
   position: absolute;
   left: 0px;
   width: 100%;
+  z-index: 1;
   filter: grayscale(1);
 }
 
 .hide {
   visibility: hidden;
+  color: transparent;
+}
+
+// causes issue on firefox
+@-moz-document url-prefix() {
+  .hide {
+    visibility: visible;
+    opacity: 0.00001;
+  }
 }
 
 #render-time {
@@ -185,5 +233,6 @@ onActivated(() => {
 #drawn-picture {
   width: 100%;
   border-bottom: 3px solid black;
+  // aspect-ratio: 4 / 3;
 }
 </style>

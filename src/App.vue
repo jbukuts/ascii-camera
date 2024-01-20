@@ -22,12 +22,6 @@ onMounted(() => {
     .then(() => {
       cameraReady.value = true
     })
-
-  store.wasmEffects = {
-    ascii: '',
-    bin_dither: '',
-    glitch_dither: ''
-  }
 })
 </script>
 

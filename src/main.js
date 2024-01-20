@@ -1,4 +1,5 @@
 import '#styles/main.scss'
+import 'rvfc-polyfill'
 
 import { createApp } from 'vue'
 import App from '@/App.vue'
