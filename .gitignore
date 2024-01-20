@@ -30,3 +30,4 @@ coverage
 *.tsbuildinfo
 
 /rust_src/target/*
+/dev-dist
