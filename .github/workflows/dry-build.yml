@@ -1,8 +1,18 @@
 name: Pull Request Testing
+
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
-  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'test'
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -11,13 +21,13 @@ defaults:
 jobs:
   dry-build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup NPM
         uses: actions/setup-node@v4
+        with:
           node-version: 18
           cache: 'npm'
 

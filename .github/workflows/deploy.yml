@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['main']
-  
+
 permissions:
   contents: write
   pages: write
@@ -27,6 +27,7 @@ jobs:
 
       - name: Setup NPM
         uses: actions/setup-node@v4
+        with:
           node-version: 18
           cache: 'npm'
 
