@@ -9,8 +9,8 @@
     "preview": "vite preview --host",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "build:rust": "./node_modules/.bin/wasm-pack build ./rust_src/ -d ../pkg --target web",
-    "build:rust-release": "./node_modules/.bin/wasm-pack build ./rust_src/ -d ../pkg --target web --release",
+    "compile": "./node_modules/.bin/wasm-pack build ./rust_src/ -d ../pkg --target web",
+    "compile:release": "./node_modules/.bin/wasm-pack build ./rust_src/ -d ../pkg --target web --release",
     "generate-assets": "pwa-assets-generator --preset minimal-2023 public/logo.png"
   },
   "dependencies": {
