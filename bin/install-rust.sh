@@ -5,10 +5,10 @@ echo "Installing rustup..."
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # Adding binaries to path
 
-echo "HOME: ${$HOME}"
+echo "HOME: ${HOME}"
 
 # source "$HOME/.cargo/env"
-source "/vercel/.cargo/env"
+source "/root/.cargo/env"
 
 # install the nightly toolchain
 echo "Installing nightly toolchain..."
