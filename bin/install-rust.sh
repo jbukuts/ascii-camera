@@ -14,7 +14,13 @@ echo "Installing nightly toolchain..."
 rustup toolchain install nightly
 
 # change to nightly
+echo "Setting override..."
 rustup override set nightly
 
 # set nightly to default
 # rustup defaut nightly
+
+
+# install wasm-pack
+echo "Installing wasm-pack..."
+curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
