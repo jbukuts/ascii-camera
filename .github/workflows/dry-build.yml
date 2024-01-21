@@ -1,9 +1,9 @@
-name: Build and Deploy Site
+name: Pull Request Testing
 
 on:
   workflow_dispatch:
-  push:
-    branches: ['main']
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: 'test'
   cancel-in-progress: true
 
 defaults:
@@ -19,7 +19,7 @@ defaults:
     shell: bash
 
 jobs:
-  build-and-deploy:
+  dry-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,10 +37,8 @@ jobs:
       - name: Compile WASM
         run: npm run compile:release
 
-      - name: Build static site
+      - name: Dry build site
         run: npm run build
 
-      - name: Deploy site
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
+      - name: Check contents
+        run: ls ./dist

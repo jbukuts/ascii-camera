@@ -1,31 +1,35 @@
-# ascii-camera-reborn
+# ascii-update
 
-Originally created this project as for an assignment for MART 380 in college.
-Rewritten now to have more effects (ascii / binary dithering) as well as to use Web Assembly for improved performance.
+This template should help get you started developing with Vue 3 in Vite.
 
-Built using [Vue 2]()
+## Recommended IDE Setup
+
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+
+## Customize configuration
+
+See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
-A prereq to run this project locally is the installation of both `wasm-pack` and the Rust compiler in order to be able to compile the Rust script as a wasm module that can be imported locally via npm. 
 
-Docs on installing Rust are available [here](https://www.rust-lang.org/tools/install)
+```sh
+npm install
+```
 
-Docs on `wasm-pack` are available [here](https://github.com/rustwasm/wasm-pack)
+### Compile and Hot-Reload for Development
 
-Once `wasm-pack` is installed you can run `npm ci` from the project root directory to install dependencies. Notice in the `package.json` the `jakes-photo-booth` dependency references a local folder. This is where the compiled WASM module lives.
+```sh
+npm run dev
+```
 
-Now you can run `npm run dev` to start the local dev server and navigate to `https://localhost:8080` to see the site. 
+### Compile and Minify for Production
 
-The actual source for the WASM module lives in the `src/lib.rs` script. Any changes made to the file will result in a recompile of the module automatically if you are running the `dev` script.
+```sh
+npm run build
+```
 
-## Scripts
-- `npm run dev`: Compiles the WASM module and hot-reloads for development
-- `npm run dev:vue`: Runs local Vue development server
-- `npm run dev:rust`: Compiles the WASM module and watches for changes
-- `npm run build`: Compiles and minifies for production
-- `npm run build:rust`: Just compiles the WASM module
-- `npm run serve:prod`: Runs a local server hosting the static site. Requires Python 3
-- `npm run lint`: Lints and fixes files
+### Lint with [ESLint](https://eslint.org/)
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```sh
+npm run lint
+```

@@ -1,8 +1,11 @@
-import Vue from 'vue'
-import App from './App.vue'
+import '#styles/main.scss'
+import 'rvfc-polyfill'
+// import '#pinch/dist/style.css'
 
-Vue.config.productionTip = false
+import { createApp } from 'vue'
+import App from '@/App.vue'
+// import PinchScrollZoom from '#pinch'
+const app = createApp(App)
+// app.component('pinch-zoom', PinchScrollZoom)
 
-new Vue({
-    render: h => h(App),
-}).$mount('#app')
+app.mount('#app')

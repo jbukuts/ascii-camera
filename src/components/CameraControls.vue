@@ -1,201 +1,110 @@
-<template>
-  <div id="camera-controls">
-    <div
-      class="section"
-      style="text-align: left"
-    >
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementFgColor()"
-      >
-        fg_color: {{ fgColors[fgColorIndex][0] }}
-      </p>
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementBgColor()"
-      >
-        bg_color: {{ bgColors[bgColorIndex][0] }}
-      </p>
-      <p
-        :class="effect !== 'glitch_dither' ? 'option-item' : 'option-item disabled'"
-        @click="incrementResolution()"
-      >
-        quality: {{ resolutions[resolutionIndex][0] }}
-      </p>
-      <p
-        class="option-item"
-        @click="updateEffect()"
-      >
-        effect: {{ effect }}
-      </p>
-    </div>
+<script setup>
+import { fakeCanvas } from '@/constants'
+import database from '@/database'
+import { store } from '@/store'
 
-    <div class="section">
+const storePhoto = () => {
+  const genImage = document.getElementById('drawn-picture').toDataURL()
+  const srcImage = fakeCanvas.toDataURL()
+  const settings = {
+    quality: store.quality,
+    effect: store.activeEffect,
+    background: Array.from(store.bgColor),
+    foreground: Array.from(store.fgColor),
+    dateCreated: Date.now()
+  }
+
+  database.insertValue({
+    srcImage,
+    genImage,
+    settings
+  })
+
+  console.log(settings)
+}
+</script>
+
+<template>
+  <div id="camera-controls-buttons">
+    <div class="column">
       <button
-        id="picture-button"
-        :class="cameraMode ? '' : 'disabled'"
-        @click="takePicture()"
-      >
-        <p>📸</p> 
+        @click="() => (store.showEffects = !store.showEffects)"
+        type="button">
+        {{ `${store.showEffects ? 'hide' : 'show'} effects` }}
+      </button>
+      <button
+        @click="() => (store.showSettings = !store.showSettings)"
+        type="button">
+        {{ `${store.showSettings ? 'hide' : 'show'} settings` }}
       </button>
     </div>
 
-    <div
-      class="section"
-      style="text-align: right"
-    >
-      <p
-        class="option-item"
-        @click="toggleView()"
-      >
-        {{ cameraMode ? 'upload_image' : 'camera_view' }}
-      </p>
+    <button
+      type="button"
+      :class="store.pauseStream ? 'hide' : ''"
+      :disabled="store.pauseStream"
+      @click="store.pauseStream = true"
+      id="snap-photo"></button>
+
+    <div class="column" v-if="store.pauseStream">
+      <button @click="storePhoto" type="button">save</button>
+      <button @click="store.pauseStream = false" type="button">discard</button>
     </div>
   </div>
 </template>
 
-<script>
+<style scoped lang="scss">
+#camera-controls-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1.75rem 1rem;
 
-export default {
-    name: 'CameraControls',
-    props: {
-        updateFgColor: {
-            type: Function,
-            required: true
-        },
-        updateBgColor: {
-            type: Function,
-            required: true
-        },
-        updateResolution: {
-            type: Function,
-            required: true
-        },
-        updateEffect: {
-            type: Function,
-            required: true
-        },
-        takePicture: {
-            type: Function,
-            required: true
-        },
-        toggleView: {
-            type: Function,
-            required: true
-        },
-        cameraMode: {
-            type: Boolean,
-            required: true
-        },
-        effect: {
-            type: String,
-            required: true
-        }
-    },
-    data() {
-        return {
-            resolutions: [
-                ['very_low', 12],
-                ['low', 10],
-                ['medium', 8],
-                ['high', 6]
-            ],
-            fgColors: [
-                ["white", [255,255,255]],
-                ["black", [0,0,0]],
-                ["red", [255,0,0]],
-                ["green", [0,255,0]],
-                ["blue", [0,0,255]]
-            ],
-            bgColors: [
-                ["black", [0,0,0]],
-                ["white", [255,255,255]],
-                ["red", [255,0,0]],
-                ["green", [0,255,0]],
-                ["blue", [0,0,255]]
-            ],
-            fgColorIndex: 0,
-            bgColorIndex: 0,
-            resolutionIndex: 0
-        }
-    },
-    methods: {
-        incrementBgColor() {
-            this.bgColorIndex = this.bgColorIndex <  this.bgColors.length - 1 ? this.bgColorIndex+1 : 0;
-            this.updateBgColor({ hex: this.bgColors[this.bgColorIndex][1] });
-        },
-        incrementFgColor() {
-            this.fgColorIndex = this.fgColorIndex < this.fgColors.length - 1 ? this.fgColorIndex+1 : 0;
-            this.updateFgColor({ hex: this.fgColors[this.fgColorIndex][1] });
-        },
-        incrementResolution() {
-            this.resolutionIndex = this.resolutionIndex < this.resolutions.length - 1 ? this.resolutionIndex+1 : 0;
-            this.updateResolution({ target: { value: this.resolutions[this.resolutionIndex][1] }});
-        }
-    }
-}
-</script>
-
-<style scoped>
-
-#camera-controls {
-    width: 640px;
-    height: fit-content;
-    background-color: black;
-    margin: 0 auto;
-    box-sizing: border-box;
-    padding: 1rem;
-    color: white;
-    align-items: center;
+  & .column {
     display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  & button {
+    appearance: none;
+    background-color: white;
+    font-size: 1rem;
+    padding: 0.65rem 0.2rem;
+    color: black;
+    border: 2px solid black;
+    border-radius: 6px;
+    height: fit-content;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.175);
+    }
+  }
 }
 
-.section {
-  flex: 1 1 0px
-}
+#snap-photo {
+  justify-self: center;
+  grid-column-start: 2;
+  width: fit-content;
+  border: none !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1;
+  padding: 0.65rem !important;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  font-size: 1.5rem !important;
+  line-height: 1;
 
-#picture-button {
-  border-radius: 50%;
-  height: 4rem;
-  width: 4rem;
-  border: none;
-  background-color: rgb(216, 38, 38);
-  transition: all .05s ease-in-out;
-}
+  &:hover {
+    background-color: black !important;
+  }
 
-#picture-button > p {
-  font-size: 24px;
-  margin: 0;
-  filter: grayscale(1) contrast(0%) brightness(200%);
-}
-
-#picture-button:hover {
-  cursor: pointer;
-  background-color: rgb(142, 0, 0);;
-}
-
-#picture-button:active {
-  background-color: rgb(102, 0, 0);
-  border: 1px solid #ccc;
-}
-
-.svg-inline--fa {
-  height: 1.5rem !important;
-  width: 1.5rem !important;
-  color: white;
-}
-
-.option-item {
-  margin: .5rem 0px;
-}
-
-.option-item:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.disabled {
-  opacity: .5;
-  pointer-events: none;
+  &::after {
+    content: '📷';
+    position: relative;
+    bottom: 10%;
+    filter: grayscale(1) contrast(0) brightness(200%);
+  }
 }
 </style>
