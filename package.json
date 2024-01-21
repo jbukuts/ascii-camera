@@ -14,6 +14,7 @@
     "generate-assets": "pwa-assets-generator --preset minimal-2023 public/logo.png"
   },
   "dependencies": {
+    "@coddicat/vue-pinch-scroll-zoom": "^4.3.5",
     "@vueuse/core": "^10.7.2",
     "jakes-photo-booth": "file:./pkg",
     "rvfc-polyfill": "^1.0.7",

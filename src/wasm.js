@@ -29,16 +29,7 @@ const loadWasm = async () => {
   }))
 }
 
-// const {
-//   createAsciiImage,
-//   createBadDitherImage,
-//   createDitherImage,
-//   createHeatImage,
-//   createEdgeImage,
-//   orderedDither,
-//   wasmMemory
-// } = loadWasm().then((r) => r)
-
+/** @type {Promise<EffectMap<Function>>} */
 const effectMap = (() => {
   return loadWasm().then((m) => ({
     ascii: m.createAsciiImage,
@@ -50,16 +41,6 @@ const effectMap = (() => {
     wasmMemory: m.wasmMemory
   }))
 })()
-
-/** @type {EffectMap<Function>} */
-// const effectMap = {
-//   ascii: createAsciiImage,
-//   bin_dither: createDitherImage,
-//   glitch_dither: createBadDitherImage,
-//   heat_map: createHeatImage,
-//   edge_detect: createEdgeImage,
-//   ordered_dither: orderedDither
-// }
 
 /** @type {EffectMap<Set>} */
 const effectParams = {
@@ -74,12 +55,4 @@ const effectParams = {
 const effectList = Object.keys(effectParams)
 
 export default effectMap
-export {
-  // createAsciiImage,
-  // createBadDitherImage,
-  // createDitherImage,
-  // createHeatImage,
-  // wasmMemory,
-  effectList,
-  effectParams
-}
+export { effectList, effectParams }

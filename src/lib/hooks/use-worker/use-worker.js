@@ -15,8 +15,8 @@ function useWorker(sharedSize = DEF_SHARE_SIZE) {
   // the main thread will draw the source image
   // the worker will then mutate to contain final image
   // eslint-disable-next-line no-undef
-  const sharedBuffer = new SharedArrayBuffer(sharedSize)
-  const sharedArr = new Uint8Array(sharedBuffer)
+  const sharedBuffer = ref(new SharedArrayBuffer(sharedSize))
+  const sharedArr = ref(new Uint8Array(sharedBuffer.value))
   const id = crypto.randomUUID()
 
   const worker = ref(null)
@@ -63,8 +63,8 @@ function useWorker(sharedSize = DEF_SHARE_SIZE) {
     data,
     post,
     terminate,
-    sharedBuffer,
-    sharedArr
+    sharedBuffer: sharedBuffer.value,
+    sharedArr: sharedArr.value
   }
 }
 

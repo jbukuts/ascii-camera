@@ -5,15 +5,14 @@ import CameraControls from '@/components/CameraControls.vue'
 import CameraView from '@/components/CameraView.vue'
 import LibraryView from '@/components/LibraryView.vue'
 import { store } from '@/store'
-import AboutView from './components/AboutView.vue'
+import UploadView from './components/UploadView.vue'
 
 const cameraReady = ref(false)
 
 const tabs = {
   camera: CameraView,
-  upload: '',
-  libary: LibraryView,
-  about: AboutView
+  upload: UploadView,
+  libary: LibraryView
 }
 
 onMounted(() => {
@@ -50,7 +49,10 @@ onMounted(() => {
 $main-border-size: 3px;
 
 #main-container {
+  display: flex;
+  flex-direction: column;
   border: $main-border-size solid black;
+  flex: 1;
 }
 
 #display-pane {

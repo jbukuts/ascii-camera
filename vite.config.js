@@ -1,5 +1,4 @@
 import { URL, fileURLToPath } from 'url'
-
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -50,7 +49,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@/': fileURLToPath(new URL('./src/', import.meta.url)) + '/',
+      '#pinch': fileURLToPath(
+        new URL(
+          './node_modules/@coddicat/vue-pinch-scroll-zoom',
+          import.meta.url
+        )
+      ),
       '#styles': fileURLToPath(new URL('./src/assets/styles', import.meta.url))
     }
   },
