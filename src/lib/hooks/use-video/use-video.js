@@ -24,7 +24,7 @@ export default function useVideo() {
     })
 
     videoEl?.removeEventListener('loadedmetadata', playVideo)
-    videoEl.removeAttribute(LISTENER_ATTR)
+    videoEl?.removeAttribute(LISTENER_ATTR)
   }
 
   onMounted(addListener)
