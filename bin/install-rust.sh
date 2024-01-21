@@ -17,3 +17,6 @@ rustup toolchain install nightly
 rustup override set nightly
 # set nightly to default
 # rustup defaut nightly
+
+#sanity check
+cargo --help
