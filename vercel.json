@@ -14,6 +14,6 @@
       ]
     }
   ],
-  "installCommand": "./bin/install-rust.sh && npm ci",
+  "installCommand": "chmod +x ./bin/* && ./bin/install-rust.sh && npm ci",
   "buildCommand": "./bin/build-site.sh"
 }
