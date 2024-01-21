@@ -18,5 +18,3 @@ rustup override set nightly
 
 # set nightly to default
 # rustup defaut nightly
-
-./node_modules/.bin/wasm-pack --help
