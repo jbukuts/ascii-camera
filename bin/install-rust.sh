@@ -7,7 +7,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "HOME: ${HOME}"
 
-# source "$HOME/.cargo/env"
+source "$HOME/.cargo/env"
 source "/root/.cargo/env"
 
 # install the nightly toolchain
