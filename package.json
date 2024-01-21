@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "preinstall": "chmod +x ./bin/*",
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",

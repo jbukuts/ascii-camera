@@ -43,7 +43,6 @@ export default defineConfig({
       }
     })
   ],
-  base: '/ascii-camera/',
   worker: {
     format: 'es',
     plugins: () => [wasm(), topLevelAwait()]

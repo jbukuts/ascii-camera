@@ -31,3 +31,4 @@ coverage
 
 /rust_src/target/*
 /dev-dist
+.vercel

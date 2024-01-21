@@ -17,6 +17,6 @@
   "git": {
     "deploymentEnabled": false
   },
-  "installCommand": "chmod +x ./bin/* && ./bin/install-rust.sh && npm ci",
+  "installCommand": "npm ci && ./bin/install-rust.sh",
   "buildCommand": "./bin/build-site.sh"
 }
