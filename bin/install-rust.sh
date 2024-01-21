@@ -20,7 +20,7 @@ rustup override set nightly
 # set nightly to default
 # rustup defaut nightly
 
-
 # install wasm-pack
-echo "Installing wasm-pack..."
-curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+# echo "Installing wasm-pack..."
+# curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+ls -al
