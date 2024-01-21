@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "compile": "./node_modules/.bin/wasm-pack build ./rust_src/ -d ../pkg --target web",
-    "compile:release": "./node_modules/.bin/wasm-pack --verbose build ./rust_src/ -d ../pkg --target web --release",
+    "compile:release": "cd rust_src && ../node_modules/.bin/wasm-pack build --verbose -d ../pkg --target web --release",
     "generate-assets": "pwa-assets-generator --preset minimal-2023 public/logo.png"
   },
   "dependencies": {

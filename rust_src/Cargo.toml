@@ -3,7 +3,7 @@ name = "jakes-photo-booth"
 version = "0.1.0"
 edition = "2021"
 description = "Image effects written in Rust for WebAssembly"
-repository = "https://github.com/jbukuts/ascii-camera.git"
+repository = "https://github.com/jbukuts/ascii-camera"
 license = "MIT"
 
 [profile.release]
